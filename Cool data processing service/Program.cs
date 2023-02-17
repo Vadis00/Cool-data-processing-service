@@ -1,18 +1,26 @@
-﻿using System.IO;
+﻿using Cool_data_processing_service.Service;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.IO;
 
 public class Program
 {
     static void Main()
     {
-        var watcher = new FileSystemWatcher();
-        watcher.Path = @"C:\Users\vgome\OneDrive\Рабочий стол\test";
-        watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-                               | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-        watcher.Filter = "*.*";
-        watcher.Changed += OnChanged;
-        watcher.EnableRaisingEvents = true;
+        //setup our DI
+        var serviceProvider = new ServiceCollection()
+            .AddLogging()
+            .AddSingleton<FileProcessingService>()
+            .AddSingleton<FileWatcherService>()
+            .AddSingleton<FileSystemWatcher>()
+            .AddSingleton<CommandHandlerService>()
+            .BuildServiceProvider();
 
-        Console.ReadLine();
+
+        //do the actual work here
+        var commandHandler = serviceProvider.GetService<CommandHandlerService>();
+        commandHandler?.Worker();
+
     }
 
     private static void OnChanged(object source, FileSystemEventArgs e)
