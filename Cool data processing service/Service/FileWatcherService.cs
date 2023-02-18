@@ -19,7 +19,6 @@ namespace Cool_data_processing_service.Service
 
             _fileSystemWatcher = fileSystemWatcher;
             _fileProcessingService = fileProcessingService;
-
         }
 
         public void ListenUpdate()
@@ -35,11 +34,7 @@ namespace Cool_data_processing_service.Service
 
         public void Stoplistening() => _fileSystemWatcher.Changed -= OnChanged;
 
-
-        private void OnChanged(object source, FileSystemEventArgs e)
-        {
-            _fileProcessingService.NewFile(e.FullPath);
-        }
+        private void OnChanged(object source, FileSystemEventArgs e) => _fileProcessingService.NewFile(e.FullPath);    
 
     }
 }
