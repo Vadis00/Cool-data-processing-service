@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
 namespace Cool_data_processing_service.Model
 {
@@ -10,9 +6,9 @@ namespace Cool_data_processing_service.Model
     {
         public Log()
         {
-            //  InvalidFiles = new();
-
+            InvalidFiles = new Collection<string>();
         }
+
         public int ParsedFiles { get; set; }
         public int ParsedLines { get; set; }
         public int FoundErrors { get; set; }

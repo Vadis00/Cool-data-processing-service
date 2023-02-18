@@ -20,9 +20,17 @@ namespace Cool_data_processing_service.Service
             log.InvalidFiles.Add(filleWay);
         }
 
-        public void Done()
+        public void Done(string status)
         {
-
+            switch (status)
+            {
+                case "line":
+                    log.ParsedLines++;
+                    break;                
+                case "fille":
+                    log.ParsedFiles++;
+                    break;
+            }
         }
     }
 }

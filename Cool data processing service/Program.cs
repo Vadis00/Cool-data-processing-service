@@ -14,6 +14,7 @@ public class Program
             .AddSingleton<FileWatcherService>()
             .AddSingleton<FileSystemWatcher>()
             .AddSingleton<CommandHandlerService>()
+            .AddScoped<LoggerService>()
             .BuildServiceProvider();
 
 

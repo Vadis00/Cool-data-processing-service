@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
 namespace Cool_data_processing_service.Model
 {
@@ -10,10 +6,11 @@ namespace Cool_data_processing_service.Model
     {
         public Payment()
         {
-            Service = new();
+            Service = new Collection<Service>();
         }
         public string City { get; set; }
-        public  Service Service { get; set; }
+        public ICollection<Service> Service { get; set; }
+
         public decimal Total { get; set; }
     }
 }
