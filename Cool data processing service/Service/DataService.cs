@@ -11,21 +11,6 @@ namespace Cool_data_processing_service.Service
 {
     public class DataService
     {
-        private readonly string directoryPath;
-        private readonly DateTime currentDate;
-        public DataService()
-        {
-            currentDate = DateTime.Now;
-
-            directoryPath = ConfigurationManager.AppSettings.Get("OutputFolder");
-
-            if (!Directory.Exists(directoryPath))
-                throw new Exception($"The specified directory does not exist!\n " +
-                    $"Directory: ${directoryPath}");
-
-
-        }
-
         public async Task<Collection<string>> ReadAsync(string path)
         {
             Collection<string> lines = new();
@@ -52,27 +37,18 @@ namespace Cool_data_processing_service.Service
             return lines;
         }
 
-        public async Task SaveAsync(string json)
+        public async Task SaveAsync(string path, string data)
         {
-            int prefix = Directory.GetFiles(directoryPath).Length;
-            string fillePath = GenerateFillePath(prefix);
-
-            if (!File.Exists(fillePath))
+            if (!File.Exists(path))
             {
-                using (var stream = File.Create(fillePath))
+                using (var stream = File.Create(path))
                 {
                     using (TextWriter tw = new StreamWriter(stream))
                     {
-                        await tw.WriteAsync(json);
+                        await tw.WriteAsync(data);
                     }
                 }
             }
         }
-
-        private string GenerateFillePath(int prefix)
-        {
-            return $@"{directoryPath}\{currentDate.ToString("dd.MM.yyyy")}-{prefix}.json";
-        }
-
     }
 }

@@ -3,12 +3,12 @@ namespace Cool_data_processing_service.Service
 {
     public class CommandHandlerService
     {
-        private readonly FileWatcherService _fileWatcherService;
-        public CommandHandlerService(FileWatcherService fileWatcherService)
+        private readonly Worker _worker;
+        public CommandHandlerService(Worker worker)
         {
-            _fileWatcherService = fileWatcherService;
+            _worker = worker;
         }
-        public void Worker()
+        public async Task Worker()
         {
             string command;
 
@@ -19,6 +19,7 @@ namespace Cool_data_processing_service.Service
             Console.WriteLine();
             Console.WriteLine("Enter the command..");
 
+
             while (true)
             {
                 Console.Write("Command: ");
@@ -27,10 +28,10 @@ namespace Cool_data_processing_service.Service
                 switch (command)
                 {
                     case "start":
-                        _fileWatcherService.ListenUpdate();
+                         _worker.Start();
                         break;
                     case "stop":
-                        _fileWatcherService.Stoplistening();
+                         _worker.Start();
                         break;
                     case "exit":
                         return;

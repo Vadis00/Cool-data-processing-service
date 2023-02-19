@@ -1,11 +1,11 @@
-﻿using Cool_data_processing_service.Service;
+﻿using Cool_data_processing_service;
+using Cool_data_processing_service.BackgroundService;
+using Cool_data_processing_service.Service;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System.IO;
 
 public class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
         //setup our DI
         var serviceProvider = new ServiceCollection()
@@ -16,6 +16,8 @@ public class Program
             .AddSingleton<CommandHandlerService>()
             .AddScoped<LoggerService>()
             .AddScoped<DataService>()
+            .AddScoped<LogBackgroundService>()
+            .AddScoped<Worker>()
             .BuildServiceProvider();
 
 

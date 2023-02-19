@@ -1,23 +1,27 @@
 ﻿using Cool_data_processing_service.Model;
-using Microsoft.VisualBasic;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Globalization;
-using System.IO;
 using System.Text.Json;
-using System.Xml.Linq;
-using System.Linq;
 
 namespace Cool_data_processing_service.Service
 {
     public class FileProcessingService
     {
         private readonly LoggerService logger;
+
         private readonly DataService _dataService;
+        private readonly string _directoryPath;
+        private readonly DateTime _currentDate;
         public FileProcessingService(LoggerService loggerService, DataService dataService)
         {
+            _directoryPath = ConfigurationManager.AppSettings.Get("OutputFolder");
+
+            if (!Directory.Exists(_directoryPath))
+                throw new Exception($"The specified directory does not exist!\n " +
+                    $"Directory: ${_directoryPath}");
+
+            _currentDate = DateTime.Now;
             logger = loggerService;
             _dataService = dataService;
         }
@@ -28,7 +32,10 @@ namespace Cool_data_processing_service.Service
 
             string jsonString = JsonSerializer.Serialize(paymentList);
 
-            await _dataService.SaveAsync(jsonString);
+            int prefix = Directory.GetFiles(_directoryPath).Length;
+            string fillePath = GenerateFilleResultPath(prefix);
+
+            await _dataService.SaveAsync(fillePath, jsonString);
         }
 
         private async Task<ICollection<Payment>> ParseFileAsync(string filleWay)
@@ -113,6 +120,11 @@ namespace Cool_data_processing_service.Service
                 return false;
 
             return true;
+        }
+
+        private string GenerateFilleResultPath(int prefix)
+        {
+            return $@"{_directoryPath}\{_currentDate.ToString("dd.MM.yyyy")}-{prefix}.json";
         }
     }
 }

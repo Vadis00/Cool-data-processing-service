@@ -1,17 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Configuration;
+using System.Text.Json;
 
 namespace Cool_data_processing_service.Service
 {
     public class LoggerService
     {
-        private readonly Model.Log log;
-        public LoggerService()
+        private Model.Log log;
+        private readonly DataService _dataService;
+        private readonly string _directoryPath;
+
+        public LoggerService(DataService dataService)
         {
             log = new();
+            _dataService = dataService;
+            _directoryPath = ConfigurationManager.AppSettings.Get("OutputFolder");
         }
 
         public void Error(string filleWay)
@@ -26,11 +28,18 @@ namespace Cool_data_processing_service.Service
             {
                 case "line":
                     log.ParsedLines++;
-                    break;                
+                    break;
                 case "fille":
                     log.ParsedFiles++;
                     break;
             }
+        }
+
+        public async Task Save()
+        {
+            string json = JsonSerializer.Serialize(log);
+            await _dataService.SaveAsync($@"{_directoryPath}\meta.log", json);
+            log = new();
         }
     }
 }
