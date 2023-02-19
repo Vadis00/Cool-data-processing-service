@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using Cool_data_processing_service.Const;
+using System.Configuration;
 using System.IO;
 
 
@@ -24,11 +25,27 @@ namespace Cool_data_processing_service.Service
             _fileSystemWatcher.EnableRaisingEvents = true;
             _fileSystemWatcher.Created += OnChanged;
 
+
         }
 
         public void Stoplistening() => _fileSystemWatcher.Changed -= OnChanged;
 
-        private void OnChanged(object source, FileSystemEventArgs e) => _fileProcessingService.NewFileAsync(e.FullPath);    
+        private void OnChanged(object source, FileSystemEventArgs e)
+        {
+            // get the file's extension 
+            string strFileExt = Path.GetExtension(e.FullPath);
+
+            switch (strFileExt)
+            {
+                case ".txt":
+                    _fileProcessingService.NewFileAsync(e.FullPath, FileType.Txt);
+                    break;
+                case ".csv":
+                    _fileProcessingService.NewFileAsync(e.FullPath, FileType.Csv);
+                    break;
+            }
+
+        }
 
     }
 }

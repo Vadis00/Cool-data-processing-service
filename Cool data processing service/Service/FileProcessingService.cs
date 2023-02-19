@@ -1,4 +1,5 @@
-﻿using Cool_data_processing_service.Model;
+﻿using Cool_data_processing_service.Const;
+using Cool_data_processing_service.Model;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Globalization;
@@ -22,9 +23,9 @@ namespace Cool_data_processing_service.Service
             _dataService = dataService;
         }
 
-        public async void NewFileAsync(string filleWay)
+        public async void NewFileAsync(string filleWay, FileType fileType)
         {
-            var paymentList = await ParseFileAsync(filleWay);
+            var paymentList = await ParseFileAsync(filleWay, fileType);
 
             string jsonString = JsonSerializer.Serialize(paymentList);
 
@@ -33,9 +34,18 @@ namespace Cool_data_processing_service.Service
             await _dataService.SaveAsync(fillePath, jsonString);
         }
 
-        private async Task<ICollection<Payment>> ParseFileAsync(string filleWay)
+        private async Task<ICollection<Payment>> ParseFileAsync(string filleWay, FileType fileType)
         {
             var paymentList = new Collection<Payment>();
+            int offset = 0;
+            switch (fileType)
+            {
+                case FileType.Txt:
+                    break;
+                case FileType.Csv:
+                    offset = 2;
+                    break;
+            }
 
             try
             {
@@ -43,6 +53,12 @@ namespace Cool_data_processing_service.Service
 
                 foreach (var line in lines)
                 {
+                    if (offset != 0)
+                    {
+                        offset--;
+                        continue;
+                    }
+
                     var name = line.Split(new string[] { ", " }, StringSplitOptions.None);
 
                     if (!validationCheck(name))

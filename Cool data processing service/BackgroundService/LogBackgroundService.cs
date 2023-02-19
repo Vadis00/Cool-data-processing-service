@@ -16,7 +16,7 @@ namespace Cool_data_processing_service.BackgroundService
         {
             token = source.Token;
             // Schedule a recurring job to run at 11 pm every day
-            var schedule = new Schedule(19, 42);
+            var schedule = new Schedule(21, 21);
             Task.Run(() => SaveDayLog(schedule), token);
         }
 

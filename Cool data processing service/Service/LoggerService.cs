@@ -6,6 +6,7 @@ namespace Cool_data_processing_service.Service
     public class LoggerService
     {
         private Model.Log log;
+        private DateTime currentDate;
         private readonly DataService _dataService;
         private readonly string _directoryPath;
         private readonly string logFileName;
@@ -46,8 +47,11 @@ namespace Cool_data_processing_service.Service
 
         public async Task Save()
         {
+            currentDate = DateTime.Now;
+            var path = $@"{_directoryPath}\{currentDate.ToString("dd.MM.yyyy")}";
             string meta = generateMetaFile();
-            await _dataService.SaveAsync($@"{_directoryPath}\{logFileName}", meta);
+
+            await _dataService.SaveAsync($@"{path}\{logFileName}", meta);
             log = new();
         }
 

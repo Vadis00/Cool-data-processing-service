@@ -16,7 +16,7 @@ namespace Cool_data_processing_service.Service
             Collection<string> lines = new();
             string line = String.Empty;
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 50; i++)
             {
                 try
                 {
@@ -31,9 +31,10 @@ namespace Cool_data_processing_service.Service
                 }
                 catch (IOException)
                 {
-                    await Task.Delay(700);
+                    await Task.Delay(1000);
                 }
             }
+
             return lines;
         }
 
