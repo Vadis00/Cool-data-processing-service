@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32922.545
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cool data processing service", "Cool data processing service\Cool data processing service.csproj", "{BF7F59F9-69D4-4475-B91E-D073DC24561F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF7F59F9-69D4-4475-B91E-D073DC24561F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF7F59F9-69D4-4475-B91E-D073DC24561F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF7F59F9-69D4-4475-B91E-D073DC24561F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF7F59F9-69D4-4475-B91E-D073DC24561F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CD306C80-F232-4A4F-86B2-D6AB65D28163}
+	EndGlobalSection
+EndGlobal
