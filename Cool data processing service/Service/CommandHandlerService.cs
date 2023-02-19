@@ -14,7 +14,7 @@ namespace Cool_data_processing_service.Service
 
             Console.WriteLine("Commands:");
             Console.WriteLine("start - Start listening to directories");
-            Console.WriteLine("start - Stop listening to the directory");
+            Console.WriteLine("stop - Stop listening to the directory");
             Console.WriteLine("exit - Finish and exit");
             Console.WriteLine();
             Console.WriteLine("Enter the command..");
@@ -28,12 +28,33 @@ namespace Cool_data_processing_service.Service
                 switch (command)
                 {
                     case "start":
-                         _worker.Start();
+                        string msg;
+                        if(!_worker.ConfigurationСheck(out msg))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine(msg);
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            _worker.Start();
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            Console.WriteLine("Listening to updates...");
+                            Console.ResetColor();
+                        }
                         break;
                     case "stop":
-                         _worker.Start();
+                         _worker.Stop();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("Listening is stopped!");
+                        Console.ResetColor();
                         break;
                     case "exit":
+                        _worker.Stop();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("Listening is stopped!");
+                        Console.ResetColor();
+                        await Task.Delay(3000);
                         return;
                 }
             }

@@ -11,11 +11,7 @@ namespace Cool_data_processing_service.Service
         private string folder { get; set; }
         public FileWatcherService(FileSystemWatcher fileSystemWatcher, FileProcessingService fileProcessingService)
         {
-            folder = ConfigurationManager.AppSettings.Get("folder");
-
-            if (!Directory.Exists(folder))
-                throw new Exception($"The specified directory does not exist!\n " +
-                    $"Directory: ${folder}");
+            folder = ConfigurationManager.AppSettings.Get("InputFolder");
 
             _fileSystemWatcher = fileSystemWatcher;
             _fileProcessingService = fileProcessingService;

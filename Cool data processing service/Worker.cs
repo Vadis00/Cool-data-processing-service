@@ -1,6 +1,6 @@
 ﻿using Cool_data_processing_service.BackgroundService;
 using Cool_data_processing_service.Service;
-
+using System.Configuration;
 
 namespace Cool_data_processing_service
 {
@@ -10,7 +10,7 @@ namespace Cool_data_processing_service
         private readonly FileWatcherService _fileWatcherService;
 
         public Worker(
-            FileWatcherService fileWatcherService, 
+            FileWatcherService fileWatcherService,
             LogBackgroundService logBackgroundService)
         {
             _logBackgroundService = logBackgroundService;
@@ -20,13 +20,39 @@ namespace Cool_data_processing_service
         public void Start()
         {
             _fileWatcherService.ListenUpdate();
-            _logBackgroundService.SaveDayLog();
+            _logBackgroundService.Start();
         }
 
         public void Stop()
         {
             _fileWatcherService.Stoplistening();
+            _logBackgroundService.Stop();
         }
 
+        public bool ConfigurationСheck(out string statusMsg)
+        {
+            var status = true;
+            statusMsg = "Error!\n";
+
+            var outputDirectoryPath = ConfigurationManager.AppSettings.Get("OutputFolder");
+            var inputDirectoryPath = ConfigurationManager.AppSettings.Get("InputFolder");
+
+            if (!Directory.Exists(outputDirectoryPath))
+            {
+                statusMsg += $"The specified directory does not exist!\n " +
+                    $"Output Directory: {outputDirectoryPath}\n";
+                status = false;
+            }
+
+            if (!Directory.Exists(inputDirectoryPath))
+            {
+                statusMsg += $"The specified directory does not exist!\n " +
+                    $"Input Directory: {inputDirectoryPath}\n";
+                status = false;
+
+            }
+
+            return status;
+        }
     }
 }

@@ -12,14 +12,10 @@ namespace Cool_data_processing_service.Service
 
         private readonly DataService _dataService;
         private readonly string _directoryPath;
-        private readonly DateTime _currentDate;
+        private DateTime _currentDate;
         public FileProcessingService(LoggerService loggerService, DataService dataService)
         {
             _directoryPath = ConfigurationManager.AppSettings.Get("OutputFolder");
-
-            if (!Directory.Exists(_directoryPath))
-                throw new Exception($"The specified directory does not exist!\n " +
-                    $"Directory: ${_directoryPath}");
 
             _currentDate = DateTime.Now;
             logger = loggerService;
@@ -32,8 +28,7 @@ namespace Cool_data_processing_service.Service
 
             string jsonString = JsonSerializer.Serialize(paymentList);
 
-            int prefix = Directory.GetFiles(_directoryPath).Length;
-            string fillePath = GenerateFilleResultPath(prefix);
+            string fillePath = generateFilleResultPath();
 
             await _dataService.SaveAsync(fillePath, jsonString);
         }
@@ -42,62 +37,69 @@ namespace Cool_data_processing_service.Service
         {
             var paymentList = new Collection<Payment>();
 
-            var lines = await _dataService.ReadAsync(filleWay);
-
-            foreach(var line in lines)
+            try
             {
-                var name = line.Split(new string[] { ", " }, StringSplitOptions.None);
+                var lines = await _dataService.ReadAsync(filleWay);
 
-                if (!ValidationCheck(name))
+                foreach (var line in lines)
                 {
-                    logger.Error(filleWay);
-                    continue;
+                    var name = line.Split(new string[] { ", " }, StringSplitOptions.None);
+
+                    if (!validationCheck(name))
+                    {
+                        logger.Error(filleWay);
+                        continue;
+                    }
+
+                    name[2] = name[2].Replace("“", "");
+
+                    Payers payer = new()
+                    {
+                        Name = $"{name[0]} {name[1]}",
+                        Payment = Decimal.Parse(name[5].Replace(".", ",")),
+                        AccountNumber = Int64.Parse(name[7]),
+                        Date = DateTime.ParseExact(name[6],
+                                               "yyyy-dd-MM",
+                                               CultureInfo.InvariantCulture,
+                                               DateTimeStyles.None)
+                    };
+
+                    var payment = paymentList.Where(p => p.City == name[2])
+                                             .DefaultIfEmpty(new() { City = name[2] })
+                                             .FirstOrDefault();
+
+                    var service = payment?.Service.Where(s => s.Name == name[8])
+                                                  .DefaultIfEmpty(new() { Name = name[8] })
+                                                  .FirstOrDefault();
+
+
+                    service?.Payers.Add(payer);
+
+
+                    service.Total = service.Payers.Sum(s => s.Payment);
+                    payment.Total = payment.Service.Sum(s => s.Total);
+
+                    if (!paymentList.Contains(payment))
+                        paymentList.Add(payment);
+
+                    if (!payment.Service.Contains(service))
+                        payment?.Service.Add(service);
+
+                    logger.Done("line");
                 }
 
-                name[2] = name[2].Replace("“", "");
 
-                Payers payer = new()
-                {
-                    Name = $"{name[0]} {name[1]}",
-                    Payment = Decimal.Parse(name[5].Replace(".", ",")),
-                    AccountNumber = Int64.Parse(name[7]),
-                    Date = DateTime.ParseExact(name[6],
-                                           "yyyy-dd-MM",
-                                           CultureInfo.InvariantCulture,
-                                           DateTimeStyles.None)
-                };
-
-                var payment = paymentList.Where(p => p.City == name[2])
-                                         .DefaultIfEmpty(new() { City = name[2] })
-                                         .FirstOrDefault();
-
-                var service = payment?.Service.Where(s => s.Name == name[8])
-                                              .DefaultIfEmpty(new() { Name = name[8] })
-                                              .FirstOrDefault();
-
-
-                service?.Payers.Add(payer);
-
-
-                service.Total = service.Payers.Sum(s => s.Payment);
-                payment.Total = payment.Service.Sum(s => s.Total);
-
-                if (!paymentList.Contains(payment))
-                    paymentList.Add(payment);
-
-                if (!payment.Service.Contains(service))
-                    payment?.Service.Add(service);
-
-                logger.Done("line");
+                logger.Done("fille");
             }
-
-
-            logger.Done("fille");
+            catch
+            {
+                logger.Error(filleWay);
+            }
 
             return paymentList;
         }
 
-        private bool ValidationCheck(string[] line)
+        private bool validationCheck(string[] line)
         {
             decimal paymentSum;
             DateTime paymentDate;
@@ -122,10 +124,15 @@ namespace Cool_data_processing_service.Service
             return true;
         }
 
-        private string GenerateFilleResultPath(int prefix)
+        private string generateFilleResultPath()
         {
-            return $@"{_directoryPath}\{_currentDate.ToString("dd.MM.yyyy")}-{prefix}.json";
+            _currentDate = DateTime.Now;
+            var path = $@"{_directoryPath}\{_currentDate.ToString("dd.MM.yyyy")}";
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            return $@"{path}\output-{Guid.NewGuid()}.json";
         }
     }
 }
-
