@@ -20,6 +20,9 @@ namespace Cool_data_processing_service.Service
             logFileName = "meta.log";
         }
 
+        /// <summary>
+        /// Print the current statistics to the console
+        /// </summary>
         public void Show()
         {
             Console.WriteLine(generateMetaFile());
@@ -48,6 +51,10 @@ namespace Cool_data_processing_service.Service
             }
         }
 
+        /// <summary>
+        /// Will save the result in meta.log. Reset statistics for the day
+        /// </summary>
+        /// <returns></returns>
         public async Task Save()
         {
             currentDate = DateTime.Now;
@@ -58,6 +65,10 @@ namespace Cool_data_processing_service.Service
             log = new();
         }
 
+        /// <summary>
+        /// Generate a path for the meta.log file
+        /// </summary>
+        /// <returns>The path to the meta.log file</returns>
         private string generateMetaFile()
         {
             var meta = $"parsed_files: {log.ParsedFiles}\n" +

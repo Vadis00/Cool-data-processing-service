@@ -24,6 +24,11 @@ namespace Cool_data_processing_service.Service
             _dataService = dataService;
         }
 
+        /// <summary>
+        /// Parse the file, generate the result in json and save the file with the result
+        /// </summary>
+        /// <param name="filleWay">The path to the file</param>
+        /// <param name="fileType">File type (.txt or .csv)</param>
         public async void NewFileAsync(string filleWay, FileType fileType)
         {
             var paymentList = await ParseFileAsync(filleWay, fileType);
@@ -39,6 +44,7 @@ namespace Cool_data_processing_service.Service
             await _dataService.SaveAsync(fillePath, jsonString);
         }
 
+
         private async Task<ICollection<Payment>> ParseFileAsync(string filleWay, FileType fileType)
         {
             var paymentList = new Collection<Payment>();
@@ -48,14 +54,17 @@ namespace Cool_data_processing_service.Service
                 case FileType.Txt:
                     break;
                 case FileType.Csv:
+                    //shift by 2 rows for csv files
                     offset = 2;
                     break;
             }
 
             try
             {
+                //Read text file as a list of strings
                 var lines = await _dataService.ReadAsync(filleWay);
 
+                //Parse each line of a text file
                 foreach (var line in lines)
                 {
                     if (offset != 0)
@@ -66,6 +75,7 @@ namespace Cool_data_processing_service.Service
 
                     var name = line.Split(new string[] { ", " }, StringSplitOptions.None);
 
+                    //Skip the line if it is not in the correct format, update the log
                     if (!validationCheck(name))
                     {
                         logger.Error(filleWay, FileStatus.InvalidLine);
@@ -120,6 +130,11 @@ namespace Cool_data_processing_service.Service
             return paymentList;
         }
 
+        /// <summary>
+        /// Checks if a file string is in the correct format.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
         private bool validationCheck(string[] line)
         {
             decimal paymentSum;
@@ -145,6 +160,10 @@ namespace Cool_data_processing_service.Service
             return true;
         }
 
+        /// <summary>
+        /// Generates a path for an output file
+        /// </summary>
+        /// <returns></returns>
         private string generateFilleResultPath()
         {
             _currentDate = DateTime.Now;
