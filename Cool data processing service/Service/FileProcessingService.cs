@@ -1,4 +1,5 @@
 ﻿using Cool_data_processing_service.Const;
+using Cool_data_processing_service.Enum;
 using Cool_data_processing_service.Model;
 using System.Collections.ObjectModel;
 using System.Configuration;
@@ -27,6 +28,10 @@ namespace Cool_data_processing_service.Service
         {
             var paymentList = await ParseFileAsync(filleWay, fileType);
 
+            if(paymentList.Count == 0)
+            {
+                logger.Error(filleWay, FileStatus.InvalidLine);
+            }
             string jsonString = JsonSerializer.Serialize(paymentList);
 
             string fillePath = generateFilleResultPath();
@@ -63,7 +68,7 @@ namespace Cool_data_processing_service.Service
 
                     if (!validationCheck(name))
                     {
-                        logger.Error(filleWay);
+                        logger.Error(filleWay, FileStatus.InvalidLine);
                         continue;
                     }
 
@@ -101,15 +106,15 @@ namespace Cool_data_processing_service.Service
                     if (!payment.Service.Contains(service))
                         payment?.Service.Add(service);
 
-                    logger.Done("line");
+                    logger.Done(FileStatus.DoneLine);
                 }
 
 
-                logger.Done("fille");
+                logger.Done(FileStatus.DoneFile);
             }
             catch
             {
-                logger.Error(filleWay);
+                logger.Error(filleWay, FileStatus.InvalidLine);
             }
 
             return paymentList;

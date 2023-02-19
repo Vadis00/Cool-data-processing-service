@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using Cool_data_processing_service.Enum;
+using System.Configuration;
 using System.Text.Json;
 
 namespace Cool_data_processing_service.Service
@@ -24,22 +25,24 @@ namespace Cool_data_processing_service.Service
             Console.WriteLine(generateMetaFile());
         }
 
-        public void Error(string filleWay)
+        public void Error(string filleWay, FileStatus status)
         {
             log.FoundErrors++;
 
-            if (!log.InvalidFiles.Contains(filleWay))
+            if (status == FileStatus.InvalidFile && !log.InvalidFiles.Contains(filleWay))
+            {
                 log.InvalidFiles.Add(filleWay);
+            }
         }
 
-        public void Done(string status)
+        public void Done(FileStatus status)
         {
             switch (status)
             {
-                case "line":
+                case FileStatus.DoneLine:
                     log.ParsedLines++;
                     break;
-                case "fille":
+                case FileStatus.DoneFile:
                     log.ParsedFiles++;
                     break;
             }
