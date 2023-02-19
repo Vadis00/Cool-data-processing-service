@@ -24,17 +24,15 @@ namespace Cool_data_processing_service.Service
         public void ListenUpdate()
         {
             _fileSystemWatcher.Path = folder;
-            _fileSystemWatcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-                                   | NotifyFilters.FileName | NotifyFilters.DirectoryName;
             _fileSystemWatcher.Filter = "*.*";
             _fileSystemWatcher.EnableRaisingEvents = true;
-            _fileSystemWatcher.Changed += OnChanged;
+            _fileSystemWatcher.Created += OnChanged;
 
         }
 
         public void Stoplistening() => _fileSystemWatcher.Changed -= OnChanged;
 
-        private void OnChanged(object source, FileSystemEventArgs e) => _fileProcessingService.NewFile(e.FullPath);    
+        private void OnChanged(object source, FileSystemEventArgs e) => _fileProcessingService.NewFileAsync(e.FullPath);    
 
     }
 }

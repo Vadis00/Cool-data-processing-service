@@ -15,6 +15,7 @@ public class Program
             .AddSingleton<FileSystemWatcher>()
             .AddSingleton<CommandHandlerService>()
             .AddScoped<LoggerService>()
+            .AddScoped<DataService>()
             .BuildServiceProvider();
 
 
@@ -23,11 +24,4 @@ public class Program
         commandHandler?.Worker();
 
     }
-
-    private static void OnChanged(object source, FileSystemEventArgs e)
-    {
-        Console.WriteLine("ff");
-        //Copies file to another directory.
-    }
-
 }

@@ -15,28 +15,29 @@ namespace Cool_data_processing_service.Service
     public class FileProcessingService
     {
         private readonly LoggerService logger;
-        public FileProcessingService(LoggerService loggerService)
+        private readonly DataService _dataService;
+        public FileProcessingService(LoggerService loggerService, DataService dataService)
         {
             logger = loggerService;
+            _dataService = dataService;
         }
 
-        public async Task NewFile(string filleWay)
+        public async void NewFileAsync(string filleWay)
         {
-            var paymentList = await ParseFile(filleWay);
-
+            var paymentList = await ParseFileAsync(filleWay);
 
             string jsonString = JsonSerializer.Serialize(paymentList);
 
+            await _dataService.SaveAsync(jsonString);
         }
 
-        private async Task<ICollection<Payment>> ParseFile(string filleWay)
+        private async Task<ICollection<Payment>> ParseFileAsync(string filleWay)
         {
-            Collection<Payment> paymentList = new Collection<Payment>();
-            //John, Doe, “Lviv, Kleparivska 35, 4”, 500.0, 2022-27-01, 1234567, Water
+            var paymentList = new Collection<Payment>();
 
-            var fille = await File.ReadAllLinesAsync(filleWay);
+            var lines = await _dataService.ReadAsync(filleWay);
 
-            foreach (var line in fille)
+            foreach(var line in lines)
             {
                 var name = line.Split(new string[] { ", " }, StringSplitOptions.None);
 
@@ -45,6 +46,8 @@ namespace Cool_data_processing_service.Service
                     logger.Error(filleWay);
                     continue;
                 }
+
+                name[2] = name[2].Replace("“", "");
 
                 Payers payer = new()
                 {
@@ -81,6 +84,7 @@ namespace Cool_data_processing_service.Service
                 logger.Done("line");
             }
 
+
             logger.Done("fille");
 
             return paymentList;
@@ -112,3 +116,4 @@ namespace Cool_data_processing_service.Service
         }
     }
 }
+
