@@ -37,19 +37,39 @@ namespace Cool_data_processing_service
             var outputDirectoryPath = ConfigurationManager.AppSettings.Get("OutputFolder");
             var inputDirectoryPath = ConfigurationManager.AppSettings.Get("InputFolder");
 
+            var saveLogInHours = ConfigurationManager.AppSettings.Get("SaveLogInHours");
+            var saveLogInMinutes = ConfigurationManager.AppSettings.Get("SaveLogInMinutes");
+
             if (!Directory.Exists(outputDirectoryPath))
             {
                 statusMsg += $"The specified directory does not exist!\n " +
-                    $"Output Directory: {outputDirectoryPath}\n";
+                    $"Output Directory: {outputDirectoryPath}\n\n";
                 status = false;
             }
 
             if (!Directory.Exists(inputDirectoryPath))
             {
                 statusMsg += $"The specified directory does not exist!\n " +
-                    $"Input Directory: {inputDirectoryPath}\n";
+                    $"Input Directory: {inputDirectoryPath}\n\n";
                 status = false;
 
+            }
+
+            int number;
+            if (!int.TryParse(saveLogInHours, out number))
+            {
+                statusMsg += $"Specify the update time of the meta.log file in the App.config file!\n " +
+                    $"SaveLogInHours and SaveLogInMinutes fields" +
+                   $"Incorrect fields: saveLogInHours\n\n";
+                status = false;
+            }
+
+            if (!int.TryParse(saveLogInMinutes, out number))
+            {
+                statusMsg += $"Specify the update time of the meta.log file in the App.config file!\n " +
+                    $"SaveLogInHours and SaveLogInMinutes fields" +
+                   $"Incorrect fields: saveLogInMinutes\n\n";
+                status = false;
             }
 
             return status;

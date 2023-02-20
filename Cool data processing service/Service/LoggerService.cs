@@ -14,7 +14,13 @@ namespace Cool_data_processing_service.Service
 
         public LoggerService(DataService dataService)
         {
-            log = new();
+            log = new()
+            {
+                ParsedFiles = 0,
+                ParsedLines = 0,
+                FoundErrors = 0,
+            };
+
             _dataService = dataService;
             _directoryPath = ConfigurationManager.AppSettings.Get("OutputFolder");
             logFileName = "meta.log";
@@ -62,6 +68,15 @@ namespace Cool_data_processing_service.Service
             string meta = generateMetaFile();
 
             await _dataService.SaveAsync($@"{path}\{logFileName}", meta);
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine();
+            Console.WriteLine("Save meta.log..");
+            Show();
+            Console.WriteLine();
+            Console.ResetColor();
+            Console.Write("Command: ");
+ 
             log = new();
         }
 
@@ -78,6 +93,9 @@ namespace Cool_data_processing_service.Service
 
             foreach (var fileName in log.InvalidFiles)
                 meta += $"  {fileName}\n";
+
+            if(log.InvalidFiles.Count ==0)
+                meta += $"not found!";
 
             return meta;
         }

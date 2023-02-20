@@ -32,16 +32,20 @@ namespace Cool_data_processing_service.Service
         public async void NewFileAsync(string filleWay, FileType fileType)
         {
             var paymentList = await ParseFileAsync(filleWay, fileType);
+            logger.Done(FileStatus.DoneFile);
 
-            if(paymentList.Count == 0)
+            if (paymentList.Count == 0)
             {
-                logger.Error(filleWay, FileStatus.InvalidLine);
+                logger.Error(filleWay, FileStatus.InvalidFile);
             }
-            string jsonString = JsonSerializer.Serialize(paymentList);
+            else
+            {
+                string jsonString = JsonSerializer.Serialize(paymentList);
 
-            string fillePath = generateFilleResultPath();
+                string fillePath = generateFilleResultPath();
 
-            await _dataService.SaveAsync(fillePath, jsonString);
+                await _dataService.SaveAsync(fillePath, jsonString);
+            }
         }
 
 
@@ -119,8 +123,6 @@ namespace Cool_data_processing_service.Service
                     logger.Done(FileStatus.DoneLine);
                 }
 
-
-                logger.Done(FileStatus.DoneFile);
             }
             catch
             {
