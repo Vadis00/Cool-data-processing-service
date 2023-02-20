@@ -1,24 +1,29 @@
-﻿using System.IO;
+﻿using Cool_data_processing_service;
+using Cool_data_processing_service.BackgroundService;
+using Cool_data_processing_service.Service;
+using Microsoft.Extensions.DependencyInjection;
 
 public class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        var watcher = new FileSystemWatcher();
-        watcher.Path = @"C:\Users\vgome\OneDrive\Рабочий стол\test";
-        watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-                               | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-        watcher.Filter = "*.*";
-        watcher.Changed += OnChanged;
-        watcher.EnableRaisingEvents = true;
+        //setup our DI
+        var serviceProvider = new ServiceCollection()
+            .AddLogging()
+            .AddSingleton<FileProcessingService>()
+            .AddSingleton<FileWatcherService>()
+            .AddSingleton<FileSystemWatcher>()
+            .AddSingleton<CommandHandlerService>()
+            .AddScoped<LoggerService>()
+            .AddScoped<DataService>()
+            .AddScoped<LogBackgroundService>()
+            .AddScoped<Worker>()
+            .BuildServiceProvider();
 
-        Console.ReadLine();
+
+        //do the actual work here
+        var commandHandler = serviceProvider.GetService<CommandHandlerService>();
+        commandHandler?.Worker();
+
     }
-
-    private static void OnChanged(object source, FileSystemEventArgs e)
-    {
-        Console.WriteLine("ff");
-        //Copies file to another directory.
-    }
-
 }
