@@ -95,7 +95,7 @@ namespace Cool_data_processing_service.Service
                 meta += $"  {fileName}\n";
 
             if(log.InvalidFiles.Count ==0)
-                meta += $"not found!";
+                meta += $"invalid_files not found!";
 
             return meta;
         }
